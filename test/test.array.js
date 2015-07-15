@@ -5,9 +5,9 @@
 
 var // Expectation library:
 	chai = require( 'chai' ),
-
-	// Deep close to:
-	deepCloseTo = require( './utils/deepcloseto.js' ),
+	
+	// Matrix data structure:
+	matrix = require( 'dstructs-matrix' ),
 
 	// Module to be tested:
 	binomcoef = require( './../lib/array.js' );
@@ -31,63 +31,66 @@ describe( 'array binomcoef', function tests() {
 			var data, actual, expected;
 
 			data = [
-				1,
-				2,
-				3,
-				4,
-				5
+				50,
+				100,
+				150,
+				200
 			];
 			actual = new Array( data.length );
 
-			actual = binomcoef( actual, data, 2 );
+			actual = binomcoef( actual, data, 25 );
 
 			expected = [
-				1,
-				4,
-				9,
-				16,
-				25
+				126410606437752,
+				2.4251926972033712e+23,
+				1.9564640595300226e+28,
+				4.521713160615245e+31
 			];
 
-			assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+			assert.deepEqual( actual, expected );
 
 			// Typed arrays...
 			data = new Int32Array( data );
 			actual = new Int32Array( data.length );
 
-			actual = binomcoef( actual, data, 2 );
+			actual = binomcoef( actual, data, 25 );
 			expected = new Int32Array( expected );
 
-			assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+			assert.deepEqual( actual, expected );
+
 		});
 
 		it( 'should evaluate the function when y is an array', function test() {
 			var data, actual, expected, y;
 
 			data = [
-				0,
-				1,
 				2,
-				3,
-				4
+				4,
+				6,
+				8,
+				10
 			];
 
 		 	y = [
-				0,
-				1,
-				2,
-				3,
-				4
+				10,
+				8,
+				6,
+				4,
+				2
 			];
 			actual = new Array( data.length );
 
 			actual = binomcoef( actual, data, y );
 
 			expected = [
-
+				0,
+				0,
+				1,
+				70,
+				45
 			];
 
-			assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+			assert.deepEqual( actual, expected );
 
 			// Typed arrays...
 			data = new Int32Array( data );
@@ -96,7 +99,7 @@ describe( 'array binomcoef', function tests() {
 			actual = binomcoef( actual, data, y );
 			expected = new Int32Array( expected );
 
-			assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+			assert.deepEqual( actual, expected );
 		});
 
 		it( 'should return an empty array if provided an empty array', function test() {
@@ -135,9 +138,9 @@ describe( 'array binomcoef', function tests() {
 			y = new Int32Array( [1,2,3] );
 			actual = new Array( data.length );
 			actual = binomcoef( actual, data, y );
-			expected = [ 1, NaN, 27 ];
+			expected = [ 1, NaN, 1 ];
 
-			assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+			assert.deepEqual( actual, expected );
 
 		});
 
@@ -149,6 +152,13 @@ describe( 'array binomcoef', function tests() {
 			expect( foo2 ).to.throw( Error );
 			function foo2() {
 				binomcoef( [], [1,2], new Int32Array( [1,2,3] ) );
+			}
+		});
+
+		it( 'should throw an error if provided a matrix as y argument', function test() {
+			expect( foo ).to.throw( Error );
+			function foo() {
+				binomcoef( [], [1,2,3,4], matrix( new Int32Array( [1,2,3,4] ), [2,2] ) );
 			}
 		});
 

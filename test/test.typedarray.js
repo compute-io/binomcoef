@@ -6,8 +6,8 @@
 var // Expectation library:
 	chai = require( 'chai' ),
 
-	// Deep close to:
-	deepCloseTo = require( './utils/deepcloseto.js' ),
+	// Matrix data structure:
+	matrix = require( 'dstructs-matrix' ),
 
 	// Module to be tested:
 	binomcoef = require( './../lib/typedarray.js' );
@@ -31,25 +31,30 @@ describe( 'typed-array binomcoef', function tests() {
 	it( 'should evaluate the function when x and y are typed arrays', function test() {
 		var data, actual, expected, y;
 
-		data = new Float64Array([
-			0,
-			1,
-			2,
-			3
+		data = new Int32Array([
+			10,
+			20,
+			30,
+			40
 		]);
-		y = new Float64Array([
-			0,
-			1,
-			2,
-			3
+		y = new Int32Array([
+			5,
+			5,
+			5,
+			5
 		]);
-		actual = new Float64Array( data.length );
+		actual = new Int32Array( data.length );
 
 		actual = binomcoef( actual, data, y );
 
-		expected = new Float64Array( [1,1,4,27] );
+		expected = new Int32Array([
+			252,
+			15504,
+			142506,
+			658008
+		]);
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 	});
 
@@ -85,9 +90,9 @@ describe( 'typed-array binomcoef', function tests() {
 		y = [ 1, 2, 3, null ];
 		actual = binomcoef( actual, data, y );
 
-		expected = [ 1, 4, 27, NaN ];
+		expected = [ 1, 1, 1, NaN ];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 	});
 
@@ -95,5 +100,11 @@ describe( 'typed-array binomcoef', function tests() {
 		assert.deepEqual( binomcoef( new Int8Array(), new Int8Array() ), new Int8Array() );
 	});
 
+	it( 'should throw an error if provided a matrix as y argument', function test() {
+		expect( foo ).to.throw( Error );
+		function foo() {
+			binomcoef( [], new Int8Array( [1,2,3,4] ), matrix( new Int32Array( [1,2,3,4] ), [2,2] ) );
+		}
+	});
 
 });

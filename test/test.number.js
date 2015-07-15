@@ -25,7 +25,13 @@ describe( 'number binomcoef', function tests() {
 	});
 
 	it( 'should evaluate the function', function test() {
-		assert.closeTo( binomcoef( 0, 0 ), 0, 1e-4 );
+		assert.strictEqual( binomcoef( 100, 20 ), 535983370403809656832 );
+		assert.strictEqual( binomcoef( -2, 0 ), 1 );
+		assert.strictEqual( binomcoef( 2, 3 ), 0 );
+		assert.strictEqual( binomcoef( 17, 4 ), 2380 );
+		assert.strictEqual( binomcoef( 0, 0 ), 1 );
+		assert.strictEqual( binomcoef( 0, -1 ), 0 );
+		assert.closeTo( binomcoef( 2.5, 2 ), 1.875, 1e-12 );
 	});
 
 });

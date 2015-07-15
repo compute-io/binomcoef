@@ -6,8 +6,8 @@
 var // Expectation library:
 	chai = require( 'chai' ),
 
-	// Deep close to:
-	deepCloseTo = require( './utils/deepcloseto.js' ),
+	// Matrix data structure:
+	matrix = require( 'dstructs-matrix' ),
 
 	// Module to be tested:
 	binomcoef = require( './../lib/accessor.js' );
@@ -31,19 +31,19 @@ describe( 'accessor binomcoef', function tests() {
 		var data, actual, expected;
 
 		data = [
-			{'x':0},
-			{'x':1},
-			{'x':2},
-			{'x':3}
+			{'x':10},
+			{'x':20},
+			{'x':30},
+			{'x':40}
 		];
 		actual = new Array( data.length );
-		actual = binomcoef( actual, data, 2, getValue );
+		actual = binomcoef( actual, data, 5, getValue );
 
 		expected = [
-
+ 			252, 15504, 142506, 658008
 		];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d ) {
 			return d.x;
@@ -72,10 +72,10 @@ describe( 'accessor binomcoef', function tests() {
 		actual = binomcoef( actual, data, y, getValue );
 
 		expected = [
-
+			1, 1, 1, 1
 		];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d, i ) {
 			return d.x;
@@ -104,10 +104,10 @@ describe( 'accessor binomcoef', function tests() {
 		actual = binomcoef( actual, data, y, getValue );
 
 		expected = [
-
+			1, 1, 1, 1
 		];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d, i, j ) {
 			if ( j === 0 ) {
@@ -139,7 +139,7 @@ describe( 'accessor binomcoef', function tests() {
 		actual = binomcoef( actual, data, 1, getValue );
 
 		expected = [ 1, NaN, 3 ];
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// single non-numeric value
 		y = false;
@@ -147,15 +147,15 @@ describe( 'accessor binomcoef', function tests() {
 		actual = binomcoef( actual, data, y, getValue );
 		expected = [ NaN, NaN, NaN ];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// numeric array
 		y = [ 1, 2, 3 ];
 		actual = new Array( data.length );
 		actual = binomcoef( actual, data, y, getValue );
-		expected = [ 1, NaN, 27 ];
+		expected = [ 1, NaN, 1 ];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d, i ) {
 			return d.x;
@@ -165,9 +165,9 @@ describe( 'accessor binomcoef', function tests() {
 		y = new Int32Array( [1,2,3] );
 		actual = new Array( data.length );
 		actual = binomcoef( actual, data, y, getValue );
-		expected = [ 1, NaN, 27 ];
+		expected = [ 1, NaN, 1 ];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// object array
 		y = [
@@ -177,9 +177,9 @@ describe( 'accessor binomcoef', function tests() {
 		];
 		actual = new Array( data.length );
 		actual = binomcoef( actual, data, y, getValue2 );
-		expected = [ 1, NaN, 27 ];
+		expected = [ 1, NaN, 1 ];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue2( d, i, j ) {
 			if ( j === 0 ) {
@@ -205,6 +205,16 @@ describe( 'accessor binomcoef', function tests() {
 		expect( foo ).to.throw( Error );
 		function foo() {
 			binomcoef( [], [1,2], new Int32Array( [1,2,3] ), getValue );
+		}
+		function getValue( d ) {
+			return d;
+		}
+	});
+
+	it( 'should throw an error if provided a matrix as y argument', function test() {
+		expect( foo ).to.throw( Error );
+		function foo() {
+			binomcoef( [], [1,2,3,4], matrix( new Int32Array( [1,2,3,4] ), [2,2] ), getValue );
 		}
 		function getValue( d ) {
 			return d;

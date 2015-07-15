@@ -5,9 +5,9 @@
 
 var // Expectation library:
 	chai = require( 'chai' ),
-
-	// Deep close to:
-	deepCloseTo = require( './utils/deepcloseto.js' ),
+	
+	// Matrix data structure:
+	matrix = require( 'dstructs-matrix' ),
 
 	// Module to be tested:
 	binomcoef = require( './../lib/deepset.js' );
@@ -31,84 +31,85 @@ describe( 'deepset binomcoef', function tests() {
 		var data, actual, expected;
 
 		data = [
-			{'x':0},
-			{'x':1},
-			{'x':2},
-			{'x':3}
+			{'x':4},
+			{'x':6},
+			{'x':8},
+			{'x':10}
 		];
 
 		actual = binomcoef( data, 2, 'x' );
 
 		expected = [
-			{'x':0},
-			{'x':1},
-			{'x':4},
-			{'x':9}
+			{'x':6},
+			{'x':15},
+			{'x':28},
+			{'x':45}
 		];
 
 		assert.strictEqual( data, actual );
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 		// Custom separator...
 		data = [
-			{'x':[9,0]},
-			{'x':[9,1]},
-			{'x':[9,2]},
-			{'x':[9,3]}
+			{'x':[9,4]},
+			{'x':[9,6]},
+			{'x':[9,8]},
+			{'x':[9,10]}
 		];
 
 		data = binomcoef( data, 2, 'x/1', '/' );
 		expected = [
-			{'x':[9,0]},
-			{'x':[9,1]},
-			{'x':[9,4]},
-			{'x':[9,9]}
+			{'x':[9,6]},
+			{'x':[9,15]},
+			{'x':[9,28]},
+			{'x':[9,45]}
 		];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
+
 	});
 
 	it( 'should evaluate the binomcoef function when y is an array and deep set', function test() {
 		var data, actual, expected, y;
 
 		data = [
-			{'x':0},
-			{'x':1},
 			{'x':2},
-			{'x':3}
+			{'x':4},
+			{'x':6},
+			{'x':8}
 		];
 
-		y = [ 0, 1, 2, 3 ];
+		y = [ 8, 6, 4, 2 ];
 
 		actual = binomcoef( data, y, 'x' );
 
 		expected = [
-			{'x':1},
-			{'x':1},
-			{'x':4},
-			{'x':27}
+			{'x':0},
+			{'x':0},
+			{'x':15},
+			{'x':28}
 		];
 
 		assert.strictEqual( data, actual );
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 		// Custom separator...
 		data = [
-			{'x':[9,0]},
-			{'x':[9,1]},
 			{'x':[9,2]},
-			{'x':[9,3]}
+			{'x':[9,4]},
+			{'x':[9,6]},
+			{'x':[9,8]}
 		];
 
 		data = binomcoef( data, y, 'x/1', '/' );
 		expected = [
-			{'x':[9,1]},
-			{'x':[9,1]},
-			{'x':[9,4]},
-			{'x':[9,27]}
+			{'x':[9,0]},
+			{'x':[9,0]},
+			{'x':[9,15]},
+			{'x':[9,28]}
 		];
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 	});
 
@@ -135,7 +136,7 @@ describe( 'deepset binomcoef', function tests() {
 			{'x':[9,NaN]},
 			{'x':[9,NaN]}
 		];
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 		// raising to a scalar
 		data = [
@@ -151,7 +152,7 @@ describe( 'deepset binomcoef', function tests() {
 			{'x':[9,NaN]},
 			{'x':[9,3]}
 		];
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 		data = [
 			{'x':[9,null]},
@@ -165,9 +166,9 @@ describe( 'deepset binomcoef', function tests() {
 			{'x':[9,NaN]},
 			{'x':[9,1]},
 			{'x':[9,NaN]},
-			{'x':[9,27]}
+			{'x':[9,1]}
 		];
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
 
 		data = [
 			{'x':[9,null]},
@@ -181,9 +182,26 @@ describe( 'deepset binomcoef', function tests() {
 			{'x':[9,NaN]},
 			{'x':[9,1]},
 			{'x':[9,NaN]},
-			{'x':[9,27]}
+			{'x':[9,1]}
 		];
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( data, expected );
+	});
+
+	it( 'should throw an error if provided a matrix as y argument', function test() {
+		var data, y;
+
+		data = [
+			{'x':[9,0]},
+			{'x':[9,1]},
+			{'x':[9,2]},
+			{'x':[9,3]}
+		];
+		y = matrix( new Int32Array( [1,2,3,4] ), [2,2] );
+
+		expect( foo ).to.throw( Error );
+		function foo() {
+			binomcoef(data, y, 'x.1' );
+		}
 	});
 
 

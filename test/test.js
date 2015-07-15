@@ -12,9 +12,6 @@ var // Expectation library:
 	// Validate a value is NaN:
 	isnan = require( 'validate.io-nan' ),
 
-	// Deep close to:
-	deepCloseTo = require( './utils/deepcloseto.js' ),
-
 	// Module to be tested:
 	binomcoef = require( './../lib' ),
 
@@ -34,6 +31,16 @@ describe( 'compute-binomcoef', function tests() {
 
 	it( 'should export a function', function test() {
 		expect( binomcoef ).to.be.a( 'function' );
+	});
+
+
+	it( 'should throw an error if provided only one argument', function test() {
+
+		expect( badValue ).to.throw( Error );
+
+		function badValue() {
+				binomcoef( [1,2,3] );
+		}
 	});
 
 	it( 'should throw an error if provided an invalid option', function test() {
@@ -126,7 +133,7 @@ describe( 'compute-binomcoef', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			assert.isTrue( isnan( binomcoef( values[ i ] 1,  ) ) );
+			assert.isTrue( isnan( binomcoef( values[ i ], 1 ) ) );
 		}
 	});
 
@@ -166,23 +173,23 @@ describe( 'compute-binomcoef', function tests() {
 	});
 
 	it( 'should evaluate the  binomcoef function for two numbers', function test() {
-		assert.strictEqual( binomcoef( 2, 4 ), 16 );
-		assert.strictEqual( binomcoef( 3, 3 ), 27 );
+		assert.strictEqual( binomcoef( 2, 4 ), 0 );
+		assert.strictEqual( binomcoef( 3, 3 ), 1 );
 	});
 
 	it( 'should evaluate the  binomcoef function for a scalar and an array', function test() {
 		var data, actual, expected;
 		data = [ 1, 2 ];
 		actual = binomcoef( 2, data );
-		expected = [ 2, 4 ];
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		expected = [ 2, 1 ];
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should evaluate the  binomcoef function for a scalar and a matrix', function test() {
 		var data, actual, expected;
 		data = matrix( new Int8Array( [ 1,2,3,4 ] ), [2,2] );
-		actual = binomcoef( 2, data );
-		expected = matrix( new Float64Array( [2,4,8,16] ), [2,2] );
+		actual = binomcoef( 8, data );
+		expected = matrix( new Float64Array( [8,28,56,70] ), [2,2] );
 
 		assert.deepEqual( actual.data, expected.data );
 	});
@@ -194,18 +201,18 @@ describe( 'compute-binomcoef', function tests() {
 		actual = binomcoef( 10, data, {
 			'dtype':'int32'
 		});
-		expected = new Int32Array( [10,100] );
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		expected = new Int32Array( [10,45] );
+		assert.deepEqual( actual, expected );
 	});
 
 
 	it( 'should evaluate the binomcoef function for a scalar and a matrix and cast to a different dtype', function test() {
 		var data, actual, expected;
 		data = matrix( new Int8Array( [ 1,2,3,4 ] ), [2,2] );
-		actual = binomcoef( 2, data, {
+		actual = binomcoef( 8, data, {
 			'dtype': 'int32'
 		});
-		expected = matrix( new Int32Array( [2,4,8,16] ), [2,2] );
+		expected = matrix( new Int32Array( [8,28,56,70] ), [2,2] );
 
 		assert.strictEqual( actual.dtype, 'int32' );
 		assert.deepEqual( actual.data, expected.data );
@@ -217,7 +224,7 @@ describe( 'compute-binomcoef', function tests() {
 		actual = binomcoef( data, 2, {
 			'dtype': 'int32'
 		});
-		expected = matrix( new Int32Array( [2,4,8,16] ), [2,2] );
+		expected = matrix( new Int32Array( [0,1,3,6] ), [2,2] );
 
 		assert.strictEqual( actual.dtype, 'int32' );
 		assert.deepEqual( actual.data, expected.data );
@@ -226,26 +233,25 @@ describe( 'compute-binomcoef', function tests() {
 	it( 'should evaluate the binomcoef function for a plain array and a scalar', function test() {
 		var data, actual, expected;
 
-		data = [ 0, 1, 2, 3 ];
+		data = [ 10, 20, 30, 40 ];
 		expected = [
-			0,
-			1,
-			8,
-			27
+			45,
+			190,
+			435,
+			780
 		];
 
-		actual = binomcoef( data, 3 );
+		actual = binomcoef( data, 2 );
 		assert.notEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Mutate...
-		actual = binomcoef( data, 3, {
+		actual = binomcoef( data, 2, {
 			'copy': false
 		});
 		assert.strictEqual( actual, data );
-
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 	});
 
@@ -256,14 +262,14 @@ describe( 'compute-binomcoef', function tests() {
 		expected = [
 			1,
 			1,
-			4,
-			27
+			1,
+			1
 		];
 
 		actual = binomcoef( data, data );
 		assert.notEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Mutate...
 		actual = binomcoef( data, data, {
@@ -271,35 +277,32 @@ describe( 'compute-binomcoef', function tests() {
 		});
 		assert.strictEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 	});
 
 	it( 'should evaluate the binomcoef function for a typed array and a scalar', function test() {
 		var data, actual, expected;
 
-		data = new Int8Array( [ 0, 1, 2, 3 ] );
+		data = new Int8Array( [ 10, 20, 30, 40 ] );
 
 		expected = new Float64Array( [
-			0,
-			1,
-			8,
-			27
+			120, 1140, 4060, 9880
 		]);
 
 		actual = binomcoef( data, 3 );
 		assert.notEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Mutate:
 		actual = binomcoef( data, 3, {
 			'copy': false
 		});
 		assert.strictEqual( actual, data );
-		expected = new Int8Array( [ 0, 1, 8, 27 ] );
+		expected = new Int8Array( [ 120, 1140, 4060, 9880 ] );
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should evaluate the binomcoef function for a typed array and another typed array', function test() {
@@ -310,71 +313,68 @@ describe( 'compute-binomcoef', function tests() {
 		expected = new Float64Array( [
 			1,
 			1,
-			4,
-			27
+			1,
+			1
 		]);
 
 		actual = binomcoef( data, data );
 		assert.notEqual( actual, data );
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Mutate:
 
 		actual = binomcoef( data, data, {
 			'copy': false
 		});
-		expected = new Int8Array( [ 1, 1, 4, 27 ] );
+		expected = new Int8Array( [ 1, 1, 1, 1 ] );
 		assert.strictEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should evaluate the binomcoef function for a typed array and a scalar and return an array of a specific type', function test() {
 		var data, actual, expected;
 
-		data = [ 0, 1, 2, 3 ];
-		expected = new Int8Array( [ 0, 1, 16, 81 ] );
+		data = [ -4, -3, -2, -1  ];
+		expected = new Int8Array( [ -20, -10, -4, -1 ] );
 
-		actual = binomcoef( data, 4, {
+		actual = binomcoef( data, 3, {
 			'dtype': 'int8'
 		});
 		assert.notEqual( actual, data );
 		assert.strictEqual( actual.BYTES_PER_ELEMENT, 1 );
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should evaluate the binomcoef function for an object array and a scalar using an accessor', function test() {
 		var data, actual, expected;
 
 		data = [
-			[3,0],
-			[4,1],
-			[5,2],
-			[6,3]
+			[3,10],
+			[4,20],
+			[5,30],
+			[6,40]
 		];
 
 		expected = [
-			1,
-			1,
-			1,
-			1
+			252, 15504, 142506, 658008
 		];
 
-		actual = binomcoef( data, 0, {
+		actual = binomcoef( data, 5, {
 			'accessor': getValue
 		});
 		assert.notEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Mutate:
-		actual = binomcoef( data, 0, {
+		actual = binomcoef( data, 5, {
 			'accessor': getValue,
 			'copy': false
 		});
 		assert.strictEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d ) {
 			return d[ 1 ];
@@ -405,11 +405,11 @@ describe( 'compute-binomcoef', function tests() {
 		expected = [
 			1,
 			1,
-			4,
-			27
+			1,
+			1
 		];
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		function getValue( d, i, j ) {
 			if ( j === 0 ) {
@@ -425,40 +425,40 @@ describe( 'compute-binomcoef', function tests() {
 		var data, actual, expected;
 
 		data = [
-			{'x':[3,0]},
-			{'x':[4,1]},
-			{'x':[5,2]},
-			{'x':[6,3]}
+			{'x':[9,4]},
+			{'x':[9,6]},
+			{'x':[9,8]},
+			{'x':[9,10]}
 		];
 		expected = [
-			{'x':[3,0]},
-			{'x':[4,1]},
-			{'x':[5,8]},
-			{'x':[6,27]}
+			{'x':[9,6]},
+			{'x':[9,15]},
+			{'x':[9,28]},
+			{'x':[9,45]}
 		];
 
-		actual = binomcoef( data, 3, {
+		actual = binomcoef( data, 2, {
 			'path': 'x.1'
 		});
 
 		assert.strictEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Specify a path with a custom separator...
 		data = [
-			{'x':[3,0]},
-			{'x':[4,1]},
-			{'x':[5,2]},
-			{'x':[6,3]}
+			{'x':[9,4]},
+			{'x':[9,6]},
+			{'x':[9,8]},
+			{'x':[9,10]}
 		];
-		actual = binomcoef( data, 3, {
+		actual = binomcoef( data, 2, {
 			'path': 'x/1',
 			'sep': '/'
 		});
 		assert.strictEqual( actual, data );
 
-		assert.isTrue( deepCloseTo( actual, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should evaluate the binomcoef function for an array with another array and deep set', function test() {
@@ -480,12 +480,12 @@ describe( 'compute-binomcoef', function tests() {
 		expected = [
 			{'x':1},
 			{'x':1},
-			{'x':4},
-			{'x':27}
+			{'x':1},
+			{'x':1}
 		];
 
 		assert.strictEqual( data, actual );
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ) );
+		assert.deepEqual( actual, expected );
 
 		// Custom separator...
 		data = [
@@ -495,18 +495,19 @@ describe( 'compute-binomcoef', function tests() {
 			{'x':[9,3]}
 		];
 
-		data = binomcoef( data, y, {
+		actual = binomcoef( data, y, {
 			'path': 'x/1',
 			'sep': '/'
 		});
 		expected = [
 			{'x':[9,1]},
 			{'x':[9,1]},
-			{'x':[9,4]},
-			{'x':[9,27]}
+			{'x':[9,1]},
+			{'x':[9,1]}
 		];
 
-		assert.isTrue( deepCloseTo( data, expected, 1e-7 ), 'custom separator' );
+		assert.deepEqual( actual, expected, 'custom separator' );
+
 	});
 
 	it( 'should evaluate the binomcoef function for a matrix and a scalar', function test() {
