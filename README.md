@@ -5,13 +5,13 @@ binomcoef
 > Computes the binomial coefficient.
 
 <div class="equation" align="center" data-raw-text="
-    \binom nk = \frac{n!}{k!\,(n-k)!} \quad \text{for }\ 0\leq k\leq n" data-equation="eq:funname">
-	<img src="path" alt="description">
+    \binom nk = \frac{n!}{k!\,(n-k)!} \quad \text{for }\ 0\leq k\leq n" data-equation="eq:binomial_coefficient">
+	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn1.svg" alt="Factorial formula for the Binomial coefficient.">
 	<br>
 </div>
 
 <div class="equation" align="center" data-raw-text="{n \choose k}= \frac{\Gamma(n+1)}{\Gamma(k+1) \Gamma(n-k+1)}= \frac{1}{(n+1) \operatorname{Beta}(n-k+1,k+1)}" data-equation="eq:generalized_binomial_coefficient">
-	<img src="path" alt="description">
+	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn2.svg" alt="Generalized version of the Binomial coefficient for real numbers.">
 	<br>
 </div>
 
@@ -250,8 +250,8 @@ bool = ( mat === out );
 
 ## Implementation
 
-<div class="equation" align="center" data-raw-text="\binom nk = \prod_{i=1}^k \frac{n+1-i}{i}" data-equation="eq:funname">
-	<img src="path" alt="description">
+<div class="equation" align="center" data-raw-text="\binom nk = \prod_{i=1}^k \frac{n+1-i}{i}" data-equation="eq:multiplicative_representation">
+	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn3.svg" alt="Multiplicative definition of the Binomial coefficient.">
 	<br>
 </div>
 
