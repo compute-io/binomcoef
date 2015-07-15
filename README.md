@@ -4,6 +4,16 @@ binomcoef
 
 > Computes the binomial coefficient.
 
+<div class="equation" align="center" data-raw-text="
+    \binom nk = \frac{n!}{k!\,(n-k)!} \quad \text{for }\ 0\leq k\leq n" data-equation="eq:funname">
+	<img src="path" alt="description">
+	<br>
+</div>
+
+<div class="equation" align="center" data-raw-text="{n \choose k}= \frac{\Gamma(n+1)}{\Gamma(k+1) \Gamma(n-k+1)}= \frac{1}{(n+1) \operatorname{Beta}(n-k+1,k+1)}" data-equation="eq:generalized_binomial_coefficient">
+	<img src="path" alt="description">
+	<br>
+</div>
 
 ## Installation
 
@@ -20,9 +30,9 @@ For use in the browser, use [browserify](https://github.com/substack/node-browse
 var binomcoef = require( 'compute-binomcoef' );
 ```
 
-#### binomcoef( x[, options] )
+#### binomcoef( n, k[, options] )
 
-Evaluates the [error function](http://en.wikipedia.org/wiki/Error_function) (element-wise). `x` may be either a [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number), an [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), a [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or a [`matrix`](https://github.com/dstructs/matrix). 
+Computes the [Binomial function](https://en.wikipedia.org/wiki/Binomial_coefficient) (element-wise). `n` may be either a [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number), an [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), a [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or a [`matrix`](https://github.com/dstructs/matrix).  `k` has to be either an `array` or `matrix` of equal dimensions as `n` or a single number. Correspondingly, the function returns either an `array` with the same length as the input `array(s)`, a `matrix` with the same dimensions as the input `matrix/matrices` or a single number.
 
 ``` javascript
 var matrix = require( 'dstructs-matrix' ),
@@ -238,12 +248,18 @@ bool = ( mat === out );
 	// returns Int8Array( [0,0,0] );
 	```
 
+## Implementation
+
+<div class="equation" align="center" data-raw-text="\binom nk = \prod_{i=1}^k \frac{n+1-i}{i}" data-equation="eq:funname">
+	<img src="path" alt="description">
+	<br>
+</div>
 
 ## Examples
 
 ``` javascript
 var matrix = require( 'dstructs-matrix' ),
-	binomcoef = require( 'compute-binomcoef' );
+	 binomcoef = require( 'compute-binomcoef' );
 
 var data,
 	mat,
@@ -251,12 +267,13 @@ var data,
 	tmp,
 	i;
 
+// ----
 // Plain arrays...
 data = new Array( 10 );
 for ( i = 0; i < data.length; i++ ) {
-	data[ i ] = Math.random()*20 - 10;
+	data[ i ] = Math.round( Math.random()*20 );
 }
-out = binomcoef( data );
+out = binomcoef( data, 3 );
 
 // Object arrays (accessors)...
 function getValue( d ) {
@@ -267,7 +284,7 @@ for ( i = 0; i < data.length; i++ ) {
 		'x': data[ i ]
 	};
 }
-out = binomcoef( data, {
+out = binomcoef( data, 3, {
 	'accessor': getValue
 });
 
@@ -277,7 +294,7 @@ for ( i = 0; i < data.length; i++ ) {
 		'x': [ i, data[ i ].x ]
 	};
 }
-out = binomcoef( data, {
+out = binomcoef( data, 3, {
 	'path': 'x/1',
 	'sep': '/'
 });
@@ -285,9 +302,9 @@ out = binomcoef( data, {
 // Typed arrays...
 data = new Int32Array( 10 );
 for ( i = 0; i < data.length; i++ ) {
-	data[ i ] = Math.random() * 100;
+	data[ i ] = Math.round( Math.random()*20 );
 }
-tmp = binomcoef( data );
+tmp = binomcoef( data, 3 );
 out = '';
 for ( i = 0; i < data.length; i++ ) {
 	out += tmp[ i ];
@@ -298,11 +315,10 @@ for ( i = 0; i < data.length; i++ ) {
 
 // Matrices...
 mat = matrix( data, [5,2], 'int32' );
-out = binomcoef( mat );
-
+out = binomcoef( mat, 3 );
 
 // Matrices (custom output data type)...
-out = binomcoef( mat, {
+out = binomcoef( mat, 3, {
 	'dtype': 'uint8'
 });
 ```
