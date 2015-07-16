@@ -2,13 +2,17 @@ binomcoef
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
-> Computes the binomial coefficient.
+> Computes the [binomial coefficient](https://en.wikipedia.org/wiki/Binomial_coefficient).
+
+The [binomial coefficient](https://en.wikipedia.org/wiki/Binomial_coefficient) of two non-negative integers `n` and `k` is defined as
 
 <div class="equation" align="center" data-raw-text="
     \binom nk = \frac{n!}{k!\,(n-k)!} \quad \text{for }\ 0\leq k\leq n" data-equation="eq:binomial_coefficient">
 	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn1.svg" alt="Factorial formula for the Binomial coefficient.">
 	<br>
 </div>
+
+It can be generalized for any two real numbers `n` and `k` as follows
 
 <div class="equation" align="center" data-raw-text="{n \choose k}= \frac{\Gamma(n+1)}{\Gamma(k+1) \Gamma(n-k+1)}= \frac{1}{(n+1) \operatorname{Beta}(n-k+1,k+1)}" data-equation="eq:generalized_binomial_coefficient">
 	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn2.svg" alt="Generalized version of the Binomial coefficient for real numbers.">
@@ -41,36 +45,48 @@ var matrix = require( 'dstructs-matrix' ),
 	out,
 	i;
 
-out = binomcoef( -1 );
-// returns -0.8427
+out = binomcoef( 8, 2 );
+// returns 28
 
-out = binomcoef( [ -10, -1, 0, 1, 10 ] );
-// returns [ -1, -0.8427, 0, 0.8427, 1 ]
+out = binomcoef( 0, 0 );
+// returns 1
 
-data = [ 0, 1, 2 ];
-out = binomcoef( data );
-// returns [ 0, ~0.8427007, ~0.9953222 ]
+out = binomcoef( -4, 2 );
+// returns 10
+
+out = binomcoef( 2, -1 );
+// returns 0
+
+out = binomcoef( 3, 1.5 );
+// returns ~3.395
+
+data = [ 0, 1, 2, 3, 4 ];
+out = binomcoef( data, 2 );
+// returns [ 0, 0, 1, 3, 6 ]
+
+out = binomcoef( 6, data );
+// returns [ 1, 6, 15, 20, 15 ]
 
 data = new Int8Array( data );
-out = binomcoef( data );
-// returns Float64Array( [ 0, ~0.8427007, ~0.9953222 ] )
+out = binomcoef( data, 2 );
+// returns Float64Array( [ 0, 0, 1, 3, 6 ] )
 
 data = new Float64Array( 6 );
 for ( i = 0; i < 6; i++ ) {
-	data[ i ] = i / 2;
+	data[ i ] = i;
 }
 mat = matrix( data, [3,2], 'float64' );
 /*
-	[ 0  0.5
-	  1  1.5
-	  2  2.5 ]
+	[ 0  1
+	  2  3
+	  4  5 ]
 */
 
-out = binomcoef( mat );
+out = binomcoef( mat, 3 );
 /*
-	[  0    ~0.52
-	  ~0.84 ~0.97
-	  ~1    ~1    ]
+	[ 0  0
+	  0  1
+	  4 10 ]
 */
 ```
 
@@ -86,42 +102,75 @@ For non-numeric `arrays`, provide an accessor `function` for accessing `array` v
 
 ``` javascript
 var data = [
-	['beep', -10],
-	['boop', -1],
-	['bip', 0],
-	['bap', 1],
-	['baz', 10]
+	['beep', 5 ],
+	['boop', 10 ],
+	['bip', 15 ],
+	['bap', 20 ],
+	['baz', 25 ]
 ];
 
 function getValue( d, i ) {
 	return d[ 1 ];
 }
 
-var out = binomcoef( data, {
+var out = binomcoef( data, 2, {
 	'accessor': getValue
 });
-// returns [ -1, -0.8427, 0, 0.8427, 1 ]
+// returns [ 10, 45, 105, 190, 300 ]
 ```
+When computing the [binomial coefficient](https://en.wikipedia.org/wiki/Binomial_coefficient) for values of two object `arrays`, provide an accessor `function` which accepts `3` arguments.
+
+``` javascript
+var data = [
+	['beep', 1],
+	['boop', 2],
+	['bip', 3],
+	['bap', 4],
+	['baz', 5]
+];
+
+var y = [
+	{'x': 1},
+	{'x': 2},
+	{'x': 3},
+	{'x': 4},
+	{'x': 5}
+];
+
+function getValue( d, i, j ) {
+	if ( j === 0 ) {
+		return d[ 1 ];
+	}
+	return d.x;
+}
+
+var out = beta( data, y, {
+	'accessor': getValue
+});
+// returns [ 1, 1, 1, 1, 1 ]
+```
+
+__Note__: `j` corresponds to the input `array` index, where `j=0` is the index for the first input `array` and `j=1` is the index for the second input `array`.
 
 To [deepset](https://github.com/kgryte/utils-deep-set) an object `array`, provide a key path and, optionally, a key path separator.
 
 ``` javascript
 var data = [
-	{'x':[0,-10]},
-	{'x':[1,-1]},
-	{'x':[2,0]},
-	{'x':[3,1]},
-	{'x':[4,10]}
+	{'x':[0,0]},
+	{'x':[1,1]},
+	{'x':[2,2]},
+	{'x':[3,3]},
+	{'x':[4,4]}
 ];
 
 var out = binomcoef( data, 'x|1', '|' );
 /*
 	[
-		{'x':[0,-1]},
-		{'x':[1,-0.8427]},
-		{'x':[2,0]},
-		{'x':[3,0.8427]},
-		{'x':[4,1]}
+		{'x':[0,0]},
+		{'x':[1,0]},
+		{'x':[2,1]},
+		{'x':[3,3]},
+		{'x':[4,6]}
 	]
 */
 
@@ -136,16 +185,16 @@ var data, out;
 
 data = new Int8Array( [0, 1, 2] );
 
-out = binomcoef( data, {
+out = binomcoef( data, 1, {
 	'dtype': 'int32'
 });
-// returns Int32Array( [0,0,0] )
+// returns Int32Array( [0,1,2] )
 
 // Works for plain arrays, as well...
-out = binomcoef( [0, 1, 2], {
+out = binomcoef( [0, 1, 2], 1, {
 	'dtype': 'uint8'
 });
-// returns Uint8Array( [0,0,0] )
+// returns Uint8Array( [0,1,2] )
 ```
 
 By default, the function returns a new data structure. To mutate the input data structure (e.g., when input values can be discarded or when optimizing memory usage), set the `copy` option to `false`.
@@ -157,34 +206,34 @@ var data,
 	out,
 	i;
 
-var data = [ -10, -1, 0, 1, 10 ];
+var data = [ 0, 1, 2, 3, 4 ];
 
-var out = binomcoef( data, {
+var out = binomcoef( data, 2, {
 	'copy': false
 });
-// returns [ -1, -0.8427, 0, 0.8427, 1 ]
+// returns [ 0, 0, 1, 3, 6 ]
 
 bool = ( data === out );
 // returns true
 
 data = new Float64Array( 6 );
 for ( i = 0; i < 6; i++ ) {
-	data[ i ] = i / 2;
+	data[ i ] = i;
 }
 mat = matrix( data, [3,2], 'float64' );
 /*
-	[ 0  0.5
-	  1  1.5
-	  2  2.5 ]
+	[ 0  1
+	  2  3
+	  4  5 ]
 */
 
-out = binomcoef( mat, {
+out = binomcoef( mat, 3, {
 	'copy': false
 });
 /*
-	[  0    ~0.52
-	  ~0.84 ~0.97
-	  ~1    ~1    ]
+	[ 0  0
+	  0  1
+	  4 10 ]
 */
 
 bool = ( mat === out );
@@ -199,16 +248,16 @@ bool = ( mat === out );
 	``` javascript
 	var data, out;
 
-	out = binomcoef( null );
+	out = binomcoef( null, 1 );
 	// returns NaN
 
-	out = binomcoef( true );
+	out = binomcoef( true, 1 );
 	// returns NaN
 
-	out = binomcoef( {'a':'b'} );
+	out = binomcoef( {'a':'b'}, 1 );
 	// returns NaN
 
-	out = binomcoef( [ true, null, [] ] );
+	out = binomcoef( [ true, null, [] ], 1 );
 	// returns [ NaN, NaN, NaN ]
 
 	function getValue( d, i ) {
@@ -221,12 +270,12 @@ bool = ( mat === out );
 		{'x':null}
 	];
 
-	out = binomcoef( data, {
+	out = binomcoef( data, 1, {
 		'accessor': getValue
 	});
 	// returns [ NaN, NaN, NaN, NaN ]
 
-	out = binomcoef( data, {
+	out = binomcoef( data, 1, {
 		'path': 'x'
 	});
 	/*
@@ -242,18 +291,39 @@ bool = ( mat === out );
 *	Be careful when providing a data structure which contains non-numeric elements and specifying an `integer` output data type, as `NaN` values are cast to `0`.
 
 	``` javascript
-	var out = binomcoef( [ true, null, [] ], {
+	var out = binomcoef( [ true, null, [] ], 1 {
 		'dtype': 'int8'
 	});
 	// returns Int8Array( [0,0,0] );
 	```
 
+*	When calling the function with a numeric value as the first argument and a `matrix` or `array` as the second argument, only the `dtype` option is applicable.
+
+	``` javascript
+		// Valid:
+		var out = binomcoef( 2, [ 1, 2, 3 ], {
+			'dtype': 'int8'
+		});
+		// returns Int8Array( [2, 1, 0] )
+
+		// Not valid:
+		var out = binomcoef( 2, [ 1, 2, 3 ], {
+			'copy': false
+		});
+		// throws an error
+	```
+
+
 ## Implementation
+
+Instead of evaluating the factorial form, which is inefficient and prone to overflow for large inputs arguments, this module computes the following multiplicative representation of the binomial coefficient for integer arguments
 
 <div class="equation" align="center" data-raw-text="\binom nk = \prod_{i=1}^k \frac{n+1-i}{i}" data-equation="eq:multiplicative_representation">
 	<img src="https://cdn.rawgit.com/compute-io/binomcoef/381304df00ac0cb05857c6108bd51046d984080b/docs/img/eqn3.svg" alt="Multiplicative definition of the Binomial coefficient.">
 	<br>
 </div>
+
+For non-integer inputs, the function computes `- ln( n + 1 ) - ln( Beta( n - k + 1, k + 1 ) )` and returns the power this value to base [e](https://en.wikipedia.org/wiki/E_%28mathematical_constant%29).
 
 ## Examples
 
